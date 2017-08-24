@@ -78,7 +78,7 @@ object parseMessageErrApp {
           "account_sett_type" -> "",
           "id" ->("aerr_"+line.substring(0, 3).trim+"_"+line.substring(4, 15).trim+"_"+line.substring(28, 34).trim+"_"+line.substring(35, 45).trim+"_"+line.substring(46, 65).trim+"_"+line.substring(66, 78).trim)
         )
-      } else if (line.length > 354 && line.length < 545) {
+      } else if (line.length > 354) {
         Map(
           "right_err_flag" -> line.substring(0, 3).trim,
           "acq_inst_id_code" -> line.substring(4, 15).trim,
@@ -142,7 +142,6 @@ object parseMessageErrApp {
       "es.mapping.id" -> "id",
       "es.mapping.exclude" -> "id"
     ))
-
   }
   /*//通过封装后的方法读取GBK文件,并讲每一行数据以字符串格式返回(RDD[String])
   def transfer(sc:SparkContext,path:String):RDD[String]={
