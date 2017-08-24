@@ -7,7 +7,7 @@ import redis.clients.jedis.JedisPool
   * Created by ranzechen on 2017/7/21.
   */
 object RedisClient extends Serializable{
-  val redisHost = "100.1.1.32"
+  val redisHost = "168.33.222.97"//100.1.1.32
   val redisPort = 6379
   val redisTimeout = 30000
   lazy val pool = new JedisPool(new GenericObjectPoolConfig(), redisHost, redisPort, redisTimeout)

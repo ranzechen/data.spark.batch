@@ -12,16 +12,16 @@ import org.elasticsearch.spark._
 object YbsDataToES {
   def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf().setAppName("YbsDataToES")
-    sparkConf.set("es.nodes", "100.1.1.42,100.1.1.40,100.1.1.34")
+    sparkConf.set("es.nodes", "168.33.222.67")//100.1.1.42,100.1.1.40,100.1.1.34
     sparkConf.set("es.port", "9200")
-    sparkConf.set("cluster.name", "es-spark")
+    sparkConf.set("cluster.name", "elasticsearch")
     val sparkContext = new SparkContext(sparkConf)
     val rdd = sparkContext.textFile(args(0))
       .map(lines => {
       val splitFlag = "衚"
       val strArr = lines.split(splitFlag)
       val yymmdd: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd")
-      val yymmddhhmmss: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+      val yymmddhhmmss: SimpleDateFormat =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
       Map(
         "tftxcode" -> strArr(0),
         "tftermid" -> strArr(1),
@@ -40,8 +40,24 @@ object YbsDataToES {
         "tfrlmony" -> (if (YbsDataUtils.isNotEmpty(strArr(14))) strArr(14).toDouble else 0),
         "tftxfnco" -> strArr(15),
         "encrypt_payer_card_no" -> YbsDataUtils.encrypt("1234567848615840", strArr(16)),
-        "tfcardno" -> (if (strArr(16).length < 10) strArr(16).substring(0, 2) + "*****" + strArr(16).substring(strArr(16).length() - 2, strArr(16).length()) else strArr(16).substring(0, 6) + "*****" + strArr(16).substring(strArr(16).length() - 4, strArr(16).length())),
-        "tfmainat" -> (if (strArr(17).length < 10) strArr(17).substring(0, 2) + "*****" + strArr(17).substring(strArr(17).length() - 2, strArr(17).length()) else strArr(17).substring(0, 6) + "*****" + strArr(17).substring(strArr(17).length() - 4, strArr(17).length())),
+        "tfcardno" -> (
+          if(strArr(16).length < 2){
+            println("tftxcode"+strArr(0))
+            strArr(16)
+          } else if (strArr(16).length > 2 && strArr(16).length < 10) {
+            strArr(16).substring(0, 2) + "*****" + strArr(16).substring(strArr(16).length() - 2, strArr(16).length())
+          } else {
+            strArr(16).substring(0, 6) + "*****" + strArr(16).substring(strArr(16).length() - 4, strArr(16).length())
+          }
+          ),
+        "tfmainat" -> (
+          if(strArr(17).length < 2){
+            strArr(17)
+          }else if (strArr(17).length > 2 && strArr(17).length < 10) {
+            strArr(17).substring(0, 2) + "*****" + strArr(17).substring(strArr(17).length() - 2, strArr(17).length())
+          } else {
+            strArr(17).substring(0, 6) + "*****" + strArr(17).substring(strArr(17).length() - 4, strArr(17).length())
+          }),
         "tfreqtno" -> strArr(18),
         "tfbackno" -> strArr(19),
         "tfsdtype" -> strArr(20),
@@ -57,7 +73,14 @@ object YbsDataToES {
         "tfbfcode" -> strArr(30),
         "tfdate" -> (if (YbsDataUtils.isNotEmpty(strArr(31))) yymmddhhmmss.parse(strArr(31).trim).getTime else 0l),
         "tftxdeta" -> strArr(32),
-        "tftranno" -> (if (strArr(33).length < 10) strArr(33).substring(0, 2) + "*****" + strArr(33).substring(strArr(33).length() - 2, strArr(33).length()) else strArr(33).substring(0, 6) + "*****" + strArr(33).substring(strArr(33).length() - 4, strArr(33).length())),
+        "tftranno" -> (
+          if(strArr(33).length< 2){
+            strArr(33)
+          } else if (strArr(33).length > 2 && strArr(33).length < 10) {
+            strArr(33).substring(0, 2) + "*****" + strArr(33).substring(strArr(33).length() - 2, strArr(33).length())
+          } else {
+            strArr(33).substring(0, 6) + "*****" + strArr(33).substring(strArr(33).length() - 4, strArr(33).length())
+          }),
         "tfacqinsid" -> strArr(34),
         "tffwdinsid" -> strArr(35),
         "tfrcvinsid" -> strArr(36),
