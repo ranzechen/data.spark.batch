@@ -7,7 +7,7 @@ import org.apache.hadoop.mapred.TextInputFormat
 import org.apache.spark.rdd.RDD
 /**
   * Created by ranzechen on 2017/8/23.
-  * 解析差错流水报文文件
+  * 解析差错流水报文文件并插入到es中
   */
 object parseMessageErrApp {
   def main(args: Array[String]): Unit = {
