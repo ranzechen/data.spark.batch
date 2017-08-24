@@ -10,6 +10,9 @@ object parseMessageAcomApp {
 
   def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf().setAppName("parseMessageAcomApp")
+    sparkConf.set("es.nodes", "100.1.1.42,100.1.1.40,100.1.1.34")//
+    sparkConf.set("es.port", "9200")
+    sparkConf.set("cluster.name", "es-spark")
     val sparkContext = new SparkContext(sparkConf)
     sparkContext.textFile(args(0))
       .map(line => {

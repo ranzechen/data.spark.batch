@@ -12,9 +12,14 @@ import org.apache.spark.rdd.RDD
 object parseMessageErrApp {
   def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf().setAppName("parseMessageErrApp")
+    sparkConf.set("es.nodes", "100.1.1.42,100.1.1.40,100.1.1.34")//
+    sparkConf.set("es.port", "9200")
+    sparkConf.set("cluster.name", "es-spark")
     val sparkContext = new SparkContext(sparkConf)
 
-    transfer(sparkContext,args(0)).map(line => {
+    sparkContext.hadoopFile(args(0),classOf[TextInputFormat], classOf[LongWritable], classOf[Text], 1)
+      .map(p => new String(p._2.getBytes, 0, p._2.getLength, "GBK"))
+      .map(line => {
       val gap = 545 - line.length
       //计算汉字向前缩进的字节数
       val pattern = "[0-9]".r
@@ -139,9 +144,9 @@ object parseMessageErrApp {
     ))
 
   }
-  //通过封装后的方法读取GBK文件,并讲每一行数据以字符串格式返回(RDD[String])
+  /*//通过封装后的方法读取GBK文件,并讲每一行数据以字符串格式返回(RDD[String])
   def transfer(sc:SparkContext,path:String):RDD[String]={
     sc.hadoopFile(path,classOf[TextInputFormat],classOf[LongWritable],classOf[Text],1)
       .map(p => new String(p._2.getBytes, 0, p._2.getLength, "GBK"))
-  }
+  }*/
 }
