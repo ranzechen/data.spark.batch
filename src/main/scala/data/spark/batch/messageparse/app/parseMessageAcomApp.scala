@@ -12,7 +12,7 @@ object parseMessageAcomApp {
     val sparkConf = new SparkConf().setAppName("parseMessageAcomApp")
     sparkConf.set("es.nodes", "esIp地址1,esIp地址2,esIp地址3")//
     sparkConf.set("es.port", "9200")
-    sparkConf.set("cluster.name", "es-spark")
+    sparkConf.set("cluster.name", "es集群名称")
     val sparkContext = new SparkContext(sparkConf)
     sparkContext.textFile(args(0))
       .map(line => {
