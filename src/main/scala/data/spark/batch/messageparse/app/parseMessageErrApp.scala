@@ -12,9 +12,9 @@ import org.apache.spark.rdd.RDD
 object parseMessageErrApp {
   def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf().setAppName("parseMessageErrApp")
-    sparkConf.set("es.nodes", "100.1.1.42,100.1.1.40,100.1.1.34")//
+    sparkConf.set("es.nodes", "esIp地址1,esIp地址2,esIp地址3")//
     sparkConf.set("es.port", "9200")
-    sparkConf.set("cluster.name", "es-spark")
+    sparkConf.set("cluster.name", "es集群名称")
     val sparkContext = new SparkContext(sparkConf)
 
     sparkContext.hadoopFile(args(0),classOf[TextInputFormat], classOf[LongWritable], classOf[Text], 1)
@@ -123,7 +123,7 @@ object parseMessageErrApp {
           "rcvg_sett_institution" -> line.substring(383, 394).trim,
           "into_sett_institution" -> line.substring(395, 406).trim,
           "f60_2_5" -> line.substring(407, 409).trim,
-          //由于410-450字节存在汉字，所有从410以后计算gap并统一向前缩进相应的gap
+          //由于410-450字节存在GBK汉字，所有从410以后计算gap并统一向前缩进相应的gap
           "card_accptr_name_loc" -> line.substring(410, 450 - gap).trim,
           "special_billing_type" -> line.substring(451 - gap, 453 - gap).trim,
           "special_billing_level" -> line.substring(454 - gap, 455 - gap).trim,
