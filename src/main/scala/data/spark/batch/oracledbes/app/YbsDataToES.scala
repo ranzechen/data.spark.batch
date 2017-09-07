@@ -12,13 +12,13 @@ import org.elasticsearch.spark._
 object YbsDataToES {
   def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf().setAppName("YbsDataToES")
-    sparkConf.set("es.nodes", "168.33.222.67")//100.1.1.42,100.1.1.40,100.1.1.34
+    sparkConf.set("es.nodes", "168.33.222.67")//esip地址
     sparkConf.set("es.port", "9200")
-    sparkConf.set("cluster.name", "elasticsearch")
+    sparkConf.set("cluster.name", "elasticsearch")//es集群名称
     val sparkContext = new SparkContext(sparkConf)
     val rdd = sparkContext.textFile(args(0))
       .map(lines => {
-      val splitFlag = "衚"
+      val splitFlag = "衚"//字段分隔符
       val strArr = lines.split(splitFlag)
       val yymmdd: SimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd")
       val yymmddhhmmss: SimpleDateFormat =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
