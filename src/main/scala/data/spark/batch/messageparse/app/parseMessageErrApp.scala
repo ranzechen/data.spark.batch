@@ -4,17 +4,17 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.elasticsearch.spark._
 import org.apache.hadoop.io.{LongWritable, Text}
 import org.apache.hadoop.mapred.TextInputFormat
-import org.apache.spark.rdd.RDD
 /**
   * Created by ranzechen on 2017/8/23.
   * 解析差错流水报文文件并插入到es中
+  * usage:{args(0)=hdfspath args(1)=estype 目录名称=args(2) 文件名称=args(3)}
   */
 object parseMessageErrApp {
   def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf().setAppName("parseMessageErrApp")
-    sparkConf.set("es.nodes", "esIp地址1,esIp地址2,esIp地址3")//
+    sparkConf.set("es.nodes", "100.1.1.34,100.1.1.40,100.1.1.42")//100.1.1.34,100.1.1.40,100.1.1.42
     sparkConf.set("es.port", "9200")
-    sparkConf.set("cluster.name", "es集群名称")
+    sparkConf.set("cluster.name", "es-spark")//es-spark
     val sparkContext = new SparkContext(sparkConf)
 
     sparkContext.hadoopFile(args(0),classOf[TextInputFormat], classOf[LongWritable], classOf[Text], 1)
@@ -76,6 +76,7 @@ object parseMessageErrApp {
           "err_original_code" -> "",
           "trans_start_way" -> "",
           "account_sett_type" -> "",
+          "data_source" -> s"${args(2)}_${args(3)}",
           "id" ->("aerr_"+line.substring(0, 3).trim+"_"+line.substring(4, 15).trim+"_"+line.substring(28, 34).trim+"_"+line.substring(35, 45).trim+"_"+line.substring(46, 65).trim+"_"+line.substring(66, 78).trim)
         )
       } else if (line.length > 354) {
@@ -132,20 +133,16 @@ object parseMessageErrApp {
           "err_original_code" -> line.substring(490 - gap, 493 - gap).trim,
           "trans_start_way" -> line.substring(494 - gap, 495 - gap).trim,
           "account_sett_type" -> line.substring(496 - gap, 498 - gap).trim,
+          "data_source" -> s"${args(2)}_${args(3)}",
           "id" ->("aerrn_"+line.substring(0, 3).trim+"_"+line.substring(4, 15).trim+"_"+line.substring(28, 34).trim+"_"+line.substring(35, 45).trim+"_"+line.substring(46, 65).trim+"_"+line.substring(66, 78).trim+"_"+line.substring(355, 370).trim)
         )
       } else {
         (">>>>>Exception", (line.length, line))
       }
-    }).saveToEs({"err_"+args(1).substring(0,6)}+"/"+{args(1)},Map(
+    }).saveToEs(s"aerr_${args(1).substring(0,6)}/${args(1)}" ,Map(
       "es.index.auto.create" -> "true",
       "es.mapping.id" -> "id",
       "es.mapping.exclude" -> "id"
     ))
   }
-  /*//通过封装后的方法读取GBK文件,并讲每一行数据以字符串格式返回(RDD[String])
-  def transfer(sc:SparkContext,path:String):RDD[String]={
-    sc.hadoopFile(path,classOf[TextInputFormat],classOf[LongWritable],classOf[Text],1)
-      .map(p => new String(p._2.getBytes, 0, p._2.getLength, "GBK"))
-  }*/
 }

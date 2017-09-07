@@ -5,14 +5,15 @@ import org.elasticsearch.spark._
 /**
   * Created by ranzechen on 2017/8/17.
   * 解析一般流水报文文件
+  * usage:{args(0)=hdfspath args(1)=estype 目录名称=args(2) 文件名称=args(3)}
   */
 object parseMessageAcomApp {
 
   def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf().setAppName("parseMessageAcomApp")
-    sparkConf.set("es.nodes", "esIp地址1,esIp地址2,esIp地址3")//
+    sparkConf.set("es.nodes", "100.1.1.34,100.1.1.40,100.1.1.42")//100.1.1.34,100.1.1.40,100.1.1.42
     sparkConf.set("es.port", "9200")
-    sparkConf.set("cluster.name", "es集群名称")
+    sparkConf.set("cluster.name", "es-spark")//es-spark
     val sparkContext = new SparkContext(sparkConf)
     sparkContext.textFile(args(0))
       .map(line => {
@@ -67,6 +68,7 @@ object parseMessageAcomApp {
             "pay_way" -> "",
             "account_level" -> "",
             "counter_check" -> "",
+            "data_source" -> s"${args(2)}_${args(3)}",
             "id" -> (line.substring(0, 11).trim+"_"+line.substring(24, 30).trim+"_"+line.substring(31, 41).trim+"_"+line.substring(42, 61).trim+"_"+line.substring(62, 74).trim+"_"+line.substring(127, 142).trim)
           )
         } else if (line.length == 500) {
@@ -119,12 +121,13 @@ object parseMessageAcomApp {
             "pay_way" -> line.substring(364, 368).trim,
             "account_level" -> line.substring(455, 456).trim,
             "counter_check" -> line.substring(457, 458).trim,
+            "data_source" -> s"${args(2)}_${args(3)}",
             "id" -> (line.substring(0, 11).trim+"_"+line.substring(24, 30).trim+"_"+line.substring(31, 41).trim+"_"+line.substring(42, 61).trim+"_"+line.substring(62, 74).trim+"_"+line.substring(127, 142).trim)
           )
         }else{
           (">>>>>Exception", (line.length, line))
         }
-      }).saveToEs({"acom_"+args(1).substring(0,6)}+"/"+{args(1)},Map(
+      }).saveToEs(s"acom_${args(1).substring(0,6)}/${args(1)}",Map(
       "es.index.auto.create" -> "true",
       "es.mapping.id" -> "id",
       "es.mapping.exclude" -> "id"
