@@ -6,6 +6,5 @@ package data.spark.batch.test
 object test {
   def main(args: Array[String]): Unit = {
     val a = for(i <- Array("1","2","3","4")) yield i.toInt * 3
-    println(a.mkString(","))
   }
 }
