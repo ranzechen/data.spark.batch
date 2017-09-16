@@ -9,5 +9,8 @@ object SparkTest {
   def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf().setAppName("SparkTest")
     val sparkContext = new SparkContext(sparkConf)
+    sparkContext.textFile(args(0))
+
+      .foreach(println)
   }
 }

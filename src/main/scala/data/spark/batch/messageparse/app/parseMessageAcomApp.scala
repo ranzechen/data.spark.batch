@@ -5,17 +5,27 @@ import org.elasticsearch.spark._
 /**
   * Created by ranzechen on 2017/8/17.
   * 解析一般流水报文文件
-  * usage:{args(0)=hdfspath args(1)=estype 目录名称=args(2) 文件名称=args(3)}
+  * usage:{args(0)=hdfspath args(1)=estype args(2)=机构号 args(3)=输入文件名称 args(4)=品牌费文件路径}
   */
 object parseMessageAcomApp {
 
   def main(args: Array[String]): Unit = {
+
+    val Array(inputpath, esType,jigouhao,input_file_name,alfee_path) = args
+
     val sparkConf = new SparkConf().setAppName("parseMessageAcomApp")
     sparkConf.set("es.nodes", "100.1.1.34,100.1.1.40,100.1.1.42")//100.1.1.34,100.1.1.40,100.1.1.42
     sparkConf.set("es.port", "9200")
     sparkConf.set("cluster.name", "es-spark")//es-spark
     val sparkContext = new SparkContext(sparkConf)
-    sparkContext.textFile(args(0))
+
+    val alfeeMap = sparkContext.textFile(alfee_path)
+    //该做解析ALFEE文件
+      .foreach(println)
+
+    System.exit(0)
+
+    sparkContext.textFile(inputpath)
       .map(line => {
         val pattern = "[0-9]".r
         if (line.length == 299) {
@@ -68,7 +78,7 @@ object parseMessageAcomApp {
             "pay_way" -> "",
             "account_level" -> "",
             "counter_check" -> "",
-            "data_source" -> s"${args(2)}_${args(3)}",
+            "data_source" -> s"${jigouhao}_${input_file_name}",
             "id" -> (line.substring(0, 11).trim+"_"+line.substring(24, 30).trim+"_"+line.substring(31, 41).trim+"_"+line.substring(42, 61).trim+"_"+line.substring(62, 74).trim+"_"+line.substring(127, 142).trim)
           )
         } else if (line.length == 500) {
@@ -127,10 +137,11 @@ object parseMessageAcomApp {
         }else{
           (">>>>>Exception", (line.length, line))
         }
-      }).saveToEs(s"acom_${args(1).substring(0,6)}/${args(1)}",Map(
+      })/*.saveToEs(s"acom_${esType.substring(0,6)}/${esType}",Map(
       "es.index.auto.create" -> "true",
       "es.mapping.id" -> "id",
       "es.mapping.exclude" -> "id"
-    ))
+    ))*/
+      .foreach(println)
   }
 }
