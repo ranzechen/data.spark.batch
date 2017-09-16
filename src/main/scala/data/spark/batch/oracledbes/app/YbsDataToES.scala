@@ -2,21 +2,34 @@ package data.spark.batch.oracledbes.app
 
 import java.text.SimpleDateFormat
 
-import data.spark.batch.oracledbes.util.{YbsDataUtils, RedisService}
+import data.spark.batch.oracledbes.util.{RedisService, YbsDataUtils}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.elasticsearch.spark._
+
+import scala.collection.Map
+import scala.io.Source
+import scala.util.parsing.json.JSON
 
 /**
   * Created by ranzechen on 2017/7/14.
   */
 object YbsDataToES {
   def main(args: Array[String]): Unit = {
+    val Array(inputpath,configfile) = args
+    //加载配置文件
+    val config = Source.fromFile(configfile).mkString
+    val es_ip = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("YbsDataToES_ES_IP").toString
+    val es_port = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("YbsDataToES_ES_PORT").toString
+    val es_cluster_name = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("YbsDataToES_ES_CLUSTER_NAME").toString
+
+    println(es_ip,es_port,es_cluster_name)
+    System.exit(0)
     val sparkConf = new SparkConf().setAppName("YbsDataToES")
-    sparkConf.set("es.nodes", "168.33.222.67")//esip地址
-    sparkConf.set("es.port", "9200")
-    sparkConf.set("cluster.name", "elasticsearch")//es集群名称
+    sparkConf.set("es.nodes", es_ip)//esip地址
+    sparkConf.set("es.port", es_port)
+    sparkConf.set("cluster.name", es_cluster_name)//es集群名称
     val sparkContext = new SparkContext(sparkConf)
-    val rdd = sparkContext.textFile(args(0))
+    val rdd = sparkContext.textFile(inputpath)
       .map(lines => {
       val splitFlag = "衚"//字段分隔符
       val strArr = lines.split(splitFlag)

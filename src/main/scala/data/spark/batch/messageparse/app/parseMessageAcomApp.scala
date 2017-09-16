@@ -2,6 +2,10 @@ package data.spark.batch.messageparse.app
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.elasticsearch.spark._
+
+import scala.collection.Map
+import scala.io.Source
+import scala.util.parsing.json.JSON
 /**
   * Created by ranzechen on 2017/8/17.
   * 解析一般流水报文文件
@@ -10,24 +14,31 @@ import org.elasticsearch.spark._
 object parseMessageAcomApp {
 
   def main(args: Array[String]): Unit = {
-
-    val Array(inputpath, esType,jigouhao,input_file_name,alfee_path) = args
+    val Array(inputpath, esType,jigouhao,input_file_name,alfeepath,configfile) = args
+    //读取配置文件并获取到所需要的关联表的路径
+    val config = Source.fromFile(configfile).mkString
+    val trancodepath = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("trancodepath").toString
+    val es_ip = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("parseMessage_ES_IP").toString
+    val es_port = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("parseMessage_ES_PORT").toString
+    val es_cluster_name = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("parseMessage_ES_CLUSTER_NAME").toString
 
     val sparkConf = new SparkConf().setAppName("parseMessageAcomApp")
-    sparkConf.set("es.nodes", "100.1.1.34,100.1.1.40,100.1.1.42")//100.1.1.34,100.1.1.40,100.1.1.42
+    sparkConf.set("es.nodes", es_ip)//100.1.1.34,100.1.1.40,100.1.1.42
     sparkConf.set("es.port", "9200")
-    sparkConf.set("cluster.name", "es-spark")//es-spark
+    sparkConf.set("cluster.name", es_cluster_name)//es-spark
     val sparkContext = new SparkContext(sparkConf)
 
-    val alfeeMap = sparkContext.textFile(alfee_path)
-    //该做解析ALFEE文件
-      .foreach(println)
-
-    System.exit(0)
-
+    //添加品牌费字段并根据id转为map获取
+    val alfeeMap = sparkContext.textFile(alfeepath)
+      .map(line => {
+        val key = s"${line.substring(41,52).trim}_${line.substring(116,122).trim}_${line.substring(123,133).trim}_${line.substring(134,153).trim}_${line.substring(293,305).trim}_${line.substring(264,279).trim}"
+        val value = line.substring(319,331).trim
+        (key,value)
+      }).collect().toMap
     sparkContext.textFile(inputpath)
       .map(line => {
         val pattern = "[0-9]".r
+        val id = s"${line.substring(0, 11).trim}_${line.substring(24, 30).trim}_${line.substring(31, 41).trim}_${line.substring(42, 61).trim}_${line.substring(62, 74).trim}_${line.substring(127, 142).trim}"
         if (line.length == 299) {
           Map(
             "acq_inst_id_code" -> line.substring(0, 11).trim,
@@ -79,7 +90,8 @@ object parseMessageAcomApp {
             "account_level" -> "",
             "counter_check" -> "",
             "data_source" -> s"${jigouhao}_${input_file_name}",
-            "id" -> (line.substring(0, 11).trim+"_"+line.substring(24, 30).trim+"_"+line.substring(31, 41).trim+"_"+line.substring(42, 61).trim+"_"+line.substring(62, 74).trim+"_"+line.substring(127, 142).trim)
+            "alfee" -> alfeeMap.getOrElse(id,""),
+            "id" -> id
           )
         } else if (line.length == 500) {
           Map(
@@ -132,7 +144,8 @@ object parseMessageAcomApp {
             "account_level" -> line.substring(455, 456).trim,
             "counter_check" -> line.substring(457, 458).trim,
             "data_source" -> s"${args(2)}_${args(3)}",
-            "id" -> (line.substring(0, 11).trim+"_"+line.substring(24, 30).trim+"_"+line.substring(31, 41).trim+"_"+line.substring(42, 61).trim+"_"+line.substring(62, 74).trim+"_"+line.substring(127, 142).trim)
+            "alfee" -> alfeeMap.getOrElse(id,""),
+            "id" -> id
           )
         }else{
           (">>>>>Exception", (line.length, line))
