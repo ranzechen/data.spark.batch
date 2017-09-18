@@ -30,8 +30,7 @@ object unionResMemo1 {
     val ralt = raltutil.getSearcher(raltpath, ppbankdspath, ralt_choose_itempath)
     all_rdd(files.map(file => {
       old_rdd(file, sparkContext)
-    }))
-      .map(data => {
+    })).map(data => {
         val cardno = data.get.getOrElse("卡号", "")
         if (cardno.length != 0) {
           val raltinfo = ralt.search(cardno)
@@ -43,7 +42,8 @@ object unionResMemo1 {
         } else {
           s"##${data.get.getOrElse("姓名", "")}#${data.get.getOrElse("证件", "")}#${data.get.getOrElse("手机", "")}#${data.get.getOrElse("CVN", "")}#"
         }
-      }).sortBy(_.split("#")(2)).saveAsTextFile(unionres)
+      }).sortBy(_.split("#")(2))
+        .saveAsTextFile(unionres)
   }
 
   def old_rdd(file: String, sc: SparkContext): RDD[Option[Map[String, String]]] = {

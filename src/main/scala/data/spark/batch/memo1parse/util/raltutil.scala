@@ -43,7 +43,7 @@ class raltSearch(
           return Some(raltfield(
             bank_code = cardinfo(1).toString,
             card_type = if (cardinfo(2).toString == "credit") "信用卡" else if (cardinfo(2).toString == "debit") "借记卡" else cardinfo(2).toString,
-            bank_name = ppbankds(cardinfo(1).toString)(2).toString,
+            bank_name = if(ppbankds.getOrElse(cardinfo(1).toString,Array()).length != 0) ppbankds(cardinfo(1).toString)(2).toString else "",
             the_card_segment = cardinfo(0).toString,
             issuing_institution = getfuncStr(8),
             issuing_object = getfuncStr(9),

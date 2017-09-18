@@ -27,6 +27,8 @@ object parseMessageAcomApp {
     sparkConf.set("es.port", "9200")
     sparkConf.set("cluster.name", es_cluster_name)//es-spark
     val sparkContext = new SparkContext(sparkConf)
+    //开始读tran_code表计算金额了
+
 
     //添加品牌费字段并根据id转为map获取
     val alfeeMap = sparkContext.textFile(alfeepath)

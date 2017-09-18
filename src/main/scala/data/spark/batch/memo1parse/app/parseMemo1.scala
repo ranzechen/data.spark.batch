@@ -22,7 +22,7 @@ object parseMemo1 extends App {
           case "020052" => {
             val arr = data.tfmemo1.split("\\^")
             Some(if (arr.length >= 17) {
-              Map("发卡行" -> "", "卡号" -> arr(5).trim, "姓名" -> arr(7).trim, "证件" -> arr(6).trim, "手机" -> arr(16).trim, "CVN" -> "", "卡类型" -> "")
+              Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(7).trim, "证件" -> arr(6).trim, "手机" -> arr(16).trim, "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             })
@@ -30,7 +30,7 @@ object parseMemo1 extends App {
           case "020148" => {
             val arr = data.tfmemo.split("\\^")
             Some(if (arr.length >= 12) {
-              Map("发卡行" -> "", "卡号" -> arr(7).trim, "姓名" -> arr(3).trim, "证件" -> arr(5).trim, "手机" -> "", "CVN" -> "", "卡类型" -> "")
+              Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(3).trim, "证件" -> arr(5).trim, "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             })
@@ -38,7 +38,7 @@ object parseMemo1 extends App {
           case "000505" => {
             val arr = data.tfmemo1.split("\\+")
             Some(if (arr.length >= 7) {
-              Map("发卡行" -> "", "卡号" -> "", "姓名" -> arr(3).split(":")(1).trim, "证件" -> arr(2).split(":")(1).trim, "手机" -> "", "CVN" -> "", "卡类型" -> "")
+              Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(3).split(":")(1).trim, "证件" -> arr(2).split(":")(1).trim, "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             })
@@ -46,7 +46,7 @@ object parseMemo1 extends App {
           case "020058" => {
             val arr = data.tfmemo1.split("\\^")
             Some(if (arr.length >= 4) {
-              Map("发卡行" -> "", "卡号" -> "", "姓名" -> arr(3).trim, "证件" -> arr(4).trim, "手机" -> "", "CVN" -> "", "卡类型" -> "")
+              Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(3).trim, "证件" -> arr(4).trim, "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             })
@@ -54,7 +54,7 @@ object parseMemo1 extends App {
           case "020060" => {
             val arr = data.tfmemo1.split("\\^")
             Some(if (arr.length >= 5 && arr(1).contains(":")) {
-              Map("发卡行" -> "", "卡号" -> "", "姓名" -> arr(1).split(":")(1).trim, "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
+              Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(1).split(":")(1).trim, "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             })
@@ -62,7 +62,7 @@ object parseMemo1 extends App {
           case "020068" => {
             val arr = data.tfmemo1.split("\\^")
             Some(if (arr.length >= 3) {
-              Map("发卡行" -> "", "卡号" -> "", "姓名" -> arr(1).trim, "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
+              Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(1).trim, "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             })
@@ -71,7 +71,7 @@ object parseMemo1 extends App {
           case "020137" => {
             Some(if (data.tfmemo.contains(":")) {
               val arr = data.tfmemo.split(":")
-              Map("发卡行" -> "", "卡号" -> "", "姓名" -> arr(1).trim, "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
+              Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(1).trim, "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             })
@@ -79,7 +79,7 @@ object parseMemo1 extends App {
           case "020255" => {
             val arr = data.tfmemo.split("\\^")
             Some(if (arr.length >= 8) {
-              Map("发卡行" -> "", "卡号" -> "", "姓名" -> arr(1).trim, "证件" -> arr(3).trim, "手机" -> "", "CVN" -> "", "卡类型" -> "")
+              Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(1).trim, "证件" -> arr(3).trim, "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             })
@@ -89,6 +89,8 @@ object parseMemo1 extends App {
 
       }).filter(_ != None)
       .filter(_.get.get("姓名").get.trim.length != 0)
+      .filter(_.get.get("姓名").get.trim.length < 5)
+      .filter(!_.get.get("姓名").get.trim.contains("公司"))
       .saveAsObjectFile(outputpath)
   })
 

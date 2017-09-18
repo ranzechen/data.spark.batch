@@ -7,7 +7,8 @@ package data.spark.batch.memo1parse.util
 case class ybs_sett_data_field(
                                 tfmccode: String,
                                 tfmemo1: String,
-                                tfmemo: String
+                                tfmemo: String,
+                                tfcardno:String
                               )
 
 
@@ -17,7 +18,8 @@ object ybs_sett_data {
     ybs_sett_data_field(
       tfmccode = arr(9).trim,
       tfmemo1 = arr(58).trim,
-      tfmemo = arr(57).trim
+      tfmemo = arr(57).trim,
+      tfcardno = arr(16).trim
     )
   }
 }
