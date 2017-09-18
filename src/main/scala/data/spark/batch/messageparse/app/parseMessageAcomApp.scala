@@ -1,20 +1,20 @@
 package data.spark.batch.messageparse.app
 
 import org.apache.spark.{SparkConf, SparkContext}
-import org.elasticsearch.spark._
 
 import scala.collection.Map
 import scala.io.Source
 import scala.util.parsing.json.JSON
+
 /**
   * Created by ranzechen on 2017/8/17.
   * 解析一般流水报文文件
-  * usage:{args(0)=hdfspath args(1)=estype args(2)=机构号 args(3)=输入文件名称 args(4)=品牌费文件路径}
+  * usage:{args(0)=hdfspath args(1)=estype args(2)=机构号 args(3)=输入文件名称 args(4)=品牌费文件路径 args(5)=配置文件路径}
   */
 object parseMessageAcomApp {
 
   def main(args: Array[String]): Unit = {
-    val Array(inputpath, esType,jigouhao,input_file_name,alfeepath,configfile) = args
+    val Array(inputpath, esType, jigouhao, input_file_name, alfeepath, configfile) = args
     //读取配置文件并获取到所需要的关联表的路径
     val config = Source.fromFile(configfile).mkString
     val trancodepath = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("trancodepath").toString
@@ -23,24 +23,32 @@ object parseMessageAcomApp {
     val es_cluster_name = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("parseMessage_ES_CLUSTER_NAME").toString
 
     val sparkConf = new SparkConf().setAppName("parseMessageAcomApp")
-    sparkConf.set("es.nodes", es_ip)//100.1.1.34,100.1.1.40,100.1.1.42
+    sparkConf.set("es.nodes", es_ip) //100.1.1.34,100.1.1.40,100.1.1.42
     sparkConf.set("es.port", "9200")
-    sparkConf.set("cluster.name", es_cluster_name)//es-spark
+    sparkConf.set("cluster.name", es_cluster_name)
+    //es-spark
     val sparkContext = new SparkContext(sparkConf)
-    //开始读tran_code表计算金额了
-
+    //读tran_code表
+    val trancodeMap = sparkContext.textFile(trancodepath)
+      .map(_.split("衚"))
+      .map(arr => {
+        val key = s"${arr(2)}_${arr(8)}_${arr(5)}"
+        val valueArr = Array(arr(0), arr(1), arr(7))
+        (key, valueArr)
+      }).collect().toMap
 
     //添加品牌费字段并根据id转为map获取
     val alfeeMap = sparkContext.textFile(alfeepath)
       .map(line => {
-        val key = s"${line.substring(41,52).trim}_${line.substring(116,122).trim}_${line.substring(123,133).trim}_${line.substring(134,153).trim}_${line.substring(293,305).trim}_${line.substring(264,279).trim}"
-        val value = line.substring(319,331).trim
-        (key,value)
+        val key = s"${line.substring(41, 52).trim}_${line.substring(116, 122).trim}_${line.substring(123, 133).trim}_${line.substring(134, 153).trim}_${line.substring(293, 305).trim}_${line.substring(264, 279).trim}"
+        val value = line.substring(319, 331).trim
+        (key, value)
       }).collect().toMap
     sparkContext.textFile(inputpath)
       .map(line => {
         val pattern = "[0-9]".r
         val id = s"${line.substring(0, 11).trim}_${line.substring(24, 30).trim}_${line.substring(31, 41).trim}_${line.substring(42, 61).trim}_${line.substring(62, 74).trim}_${line.substring(127, 142).trim}"
+        val trancodekey = s"${line.substring(101, 105).trim}_${line.substring(106, 112).trim.substring(0, 2)}_${line.substring(156, 158).trim}"
         if (line.length == 299) {
           Map(
             "acq_inst_id_code" -> line.substring(0, 11).trim,
@@ -48,9 +56,9 @@ object parseMessageAcomApp {
             "sys_trace_audit_num" -> line.substring(24, 30).trim,
             "transmsn_date_time" -> line.substring(31, 41).trim,
             "primary_acct_num" -> line.substring(42, 61).trim,
-            "amt_trans" -> line.substring(62, 74).trim.toDouble,
-            "f95" -> line.substring(75, 87).trim.toDouble,
-            "amt_trans_fee" -> line.substring(88, 100).trim.toDouble,
+            "amt_trans" -> line.substring(62, 74).trim.toDouble / 100 * trancodeMap.getOrElse(trancodekey, Array(""))(2).toDouble,
+            "f95" -> line.substring(75, 87).trim.toDouble / 100,
+            "amt_trans_fee" -> line.substring(88, 100).trim.toDouble / 100,
             "message_type" -> line.substring(101, 105).trim,
             "processing_code" -> line.substring(106, 112).trim,
             "mchnt_type" -> line.substring(113, 117).trim,
@@ -63,9 +71,9 @@ object parseMessageAcomApp {
             "f90_2" -> line.substring(178, 184).trim,
             "resp_code" -> line.substring(185, 187).trim,
             "pos_entry_mode_code" -> line.substring(188, 191).trim,
-            "recycle_fee" -> pattern.findAllIn(line.substring(192, 204).trim).mkString.toDouble,
-            "pay_fee" -> pattern.findAllIn(line.substring(205, 217).trim).mkString.toDouble,
-            "transfer_sett_fee" -> pattern.findAllIn(line.substring(218, 230).trim).mkString.toDouble,
+            "recycle_fee" -> pattern.findAllIn(line.substring(192, 204).trim).mkString.toDouble / 100,
+            "pay_fee" -> pattern.findAllIn(line.substring(205, 217).trim).mkString.toDouble / 100,
+            "transfer_sett_fee" -> pattern.findAllIn(line.substring(218, 230).trim).mkString.toDouble / 100,
             "single_double_trans_marks" -> line.substring(231, 232).trim,
             "card_seq_id" -> line.substring(233, 236).trim,
             "f60_2_2" -> line.substring(237, 238).trim,
@@ -75,7 +83,7 @@ object parseMessageAcomApp {
             "trans_area_code" -> line.substring(264, 265).trim,
             "f60_2_5" -> line.substring(266, 268).trim,
             "f60_2_8" -> line.substring(269, 271).trim,
-            "installment_pay_fee" -> pattern.findAllIn(line.substring(272, 284).trim).mkString.toDouble,
+            "installment_pay_fee" -> pattern.findAllIn(line.substring(272, 284).trim).mkString.toDouble / 100,
             "authorization_flag" -> line.substring(285, 286).trim,
             "special_billing_type" -> line.substring(286, 288).trim,
             "special_billing_level" -> line.substring(288, 289).trim,
@@ -92,7 +100,9 @@ object parseMessageAcomApp {
             "account_level" -> "",
             "counter_check" -> "",
             "data_source" -> s"${jigouhao}_${input_file_name}",
-            "alfee" -> alfeeMap.getOrElse(id,""),
+            "alfee" -> alfeeMap.getOrElse(id, ""),
+            "type_name" -> (if(trancodeMap.getOrElse(trancodekey, Array()).length !=0 ) trancodeMap.get(trancodekey).get(0) else ""),
+            "tran_code" -> (if(trancodeMap.getOrElse(trancodekey, Array()).length !=0 ) trancodeMap.get(trancodekey).get(1) else ""),
             "id" -> id
           )
         } else if (line.length == 500) {
@@ -102,9 +112,9 @@ object parseMessageAcomApp {
             "sys_trace_audit_num" -> line.substring(24, 30).trim,
             "transmsn_date_time" -> line.substring(31, 41).trim,
             "primary_acct_num" -> line.substring(42, 61).trim,
-            "amt_trans" -> line.substring(62, 74).trim.toDouble,
-            "f95" -> line.substring(75, 87).trim.toDouble,
-            "amt_trans_fee" -> line.substring(88, 100).trim.toDouble,
+            "amt_trans" -> line.substring(62, 74).trim.toDouble / 100 * trancodeMap.getOrElse(trancodekey, Array(""))(2).toDouble,
+            "f95" -> line.substring(75, 87).trim.toDouble / 100,
+            "amt_trans_fee" -> line.substring(88, 100).trim.toDouble / 100,
             "message_type" -> line.substring(101, 105).trim,
             "processing_code" -> line.substring(106, 112).trim,
             "mchnt_type" -> line.substring(113, 117).trim,
@@ -117,9 +127,9 @@ object parseMessageAcomApp {
             "f90_2" -> line.substring(178, 184).trim,
             "resp_code" -> line.substring(185, 187).trim,
             "pos_entry_mode_code" -> line.substring(188, 191).trim,
-            "recycle_fee" -> pattern.findAllIn(line.substring(192, 204).trim).mkString.toDouble,
-            "pay_fee" -> pattern.findAllIn(line.substring(205, 217).trim).mkString.toDouble,
-            "transfer_sett_fee" -> pattern.findAllIn(line.substring(218, 230).trim).mkString.toDouble,
+            "recycle_fee" -> pattern.findAllIn(line.substring(192, 204).trim).mkString.toDouble / 100,
+            "pay_fee" -> pattern.findAllIn(line.substring(205, 217).trim).mkString.toDouble / 100,
+            "transfer_sett_fee" -> pattern.findAllIn(line.substring(218, 230).trim).mkString.toDouble / 100,
             "single_double_trans_marks" -> line.substring(231, 232).trim,
             "card_seq_id" -> line.substring(233, 236).trim,
             "f60_2_2" -> line.substring(237, 238).trim,
@@ -129,7 +139,7 @@ object parseMessageAcomApp {
             "trans_area_code" -> line.substring(264, 265).trim,
             "f60_2_5" -> line.substring(266, 268).trim,
             "f60_2_8" -> line.substring(269, 271).trim,
-            "installment_pay_fee" -> pattern.findAllIn(line.substring(272, 284).trim).mkString.toDouble,
+            "installment_pay_fee" -> pattern.findAllIn(line.substring(272, 284).trim).mkString.toDouble / 100,
             "authorization_flag" -> line.substring(285, 286).trim,
             "special_billing_type" -> line.substring(286, 288).trim,
             "special_billing_level" -> line.substring(288, 289).trim,
@@ -146,10 +156,12 @@ object parseMessageAcomApp {
             "account_level" -> line.substring(455, 456).trim,
             "counter_check" -> line.substring(457, 458).trim,
             "data_source" -> s"${args(2)}_${args(3)}",
-            "alfee" -> alfeeMap.getOrElse(id,""),
+            "alfee" -> alfeeMap.getOrElse(id, ""),
+            "type_name" -> (if(trancodeMap.getOrElse(trancodekey, Array()).length !=0 ) trancodeMap.get(trancodekey).get(0) else ""),
+            "tran_code" -> (if(trancodeMap.getOrElse(trancodekey, Array()).length !=0 ) trancodeMap.get(trancodekey).get(1) else ""),
             "id" -> id
           )
-        }else{
+        } else {
           (">>>>>Exception", (line.length, line))
         }
       })/*.saveToEs(s"acom_${esType.substring(0,6)}/${esType}",Map(
