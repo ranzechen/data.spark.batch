@@ -89,8 +89,8 @@ object parseMemo1 extends App {
 
       }).filter(_ != None)
       .filter(_.get.get("姓名").get.trim.length != 0)
-      .filter(_.get.get("姓名").get.trim.length < 5)
-      .filter(!_.get.get("姓名").get.trim.contains("公司"))
+        .filter(_.get.get("姓名").get.trim.length < 5)
+        .filter(!_.get.get("姓名").get.trim.contains("公司"))
       .saveAsObjectFile(outputpath)
   })
 
