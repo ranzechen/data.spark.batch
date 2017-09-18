@@ -24,7 +24,7 @@ object parseMessageAcomApp {
 
     val sparkConf = new SparkConf().setAppName("parseMessageAcomApp")
     sparkConf.set("es.nodes", es_ip) //100.1.1.34,100.1.1.40,100.1.1.42
-    sparkConf.set("es.port", "9200")
+    sparkConf.set("es.port", es_port)
     sparkConf.set("cluster.name", es_cluster_name)
     //es-spark
     val sparkContext = new SparkContext(sparkConf)
