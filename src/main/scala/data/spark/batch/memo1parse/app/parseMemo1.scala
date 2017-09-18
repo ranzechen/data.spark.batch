@@ -53,7 +53,7 @@ object parseMemo1 extends App {
           })
           case "020060" => Some({
             val arr = data.tfmemo1.split("\\^")
-            if (arr(1).contains(":")) {
+            if (arr.length > 2 && arr(1).contains(":")) {
               Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(1).split(":")(1).trim, "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
