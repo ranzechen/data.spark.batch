@@ -19,71 +19,71 @@ object parseMemo1 extends App {
       .map(data => {
         data.tfmccode match {
           //发卡行#卡号#姓名#证件#手机#CVN#卡类型
-          case "020052" => {
+          case "020052" => Some({
             val arr = data.tfmemo1.split("\\^")
-            Some(if (arr.length >= 17) {
+            if (arr.length >= 17) {
               Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(7).trim, "证件" -> arr(6).trim, "手机" -> arr(16).trim, "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
-            })
-          }
-          case "020148" => {
+            }
+          })
+          case "020148" => Some({
             val arr = data.tfmemo.split("\\^")
-            Some(if (arr.length >= 12) {
+            if (arr.length >= 12) {
               Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(3).trim, "证件" -> arr(5).trim, "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
-            })
-          }
-          case "000505" => {
+            }
+          })
+          case "000505" => Some({
             val arr = data.tfmemo1.split("\\+")
-            Some(if (arr.length >= 7) {
+            if (arr.length >= 7) {
               Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(3).split(":")(1).trim, "证件" -> arr(2).split(":")(1).trim, "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
-            })
-          }
-          case "020058" => {
+            }
+          })
+          case "020058" => Some({
             val arr = data.tfmemo1.split("\\^")
-            Some(if (arr.length >= 4) {
+            if (arr.length >= 4) {
               Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(3).trim, "证件" -> arr(4).trim, "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
-            })
-          }
-          case "020060" => {
+            }
+          })
+          case "020060" => Some({
             val arr = data.tfmemo1.split("\\^")
-            Some(if (arr(1).contains(":")) {
+            if (arr(1).contains(":")) {
               Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(1).split(":")(1).trim, "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
-            })
-          }
-          case "020068" => {
+            }
+          })
+          case "020068" => Some({
             val arr = data.tfmemo1.split("\\^")
-            Some(if (arr.length >= 3) {
+            if (arr.length >= 3) {
               Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(1).trim, "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
-            })
-          }
+            }
+          })
 
-          case "020137" => {
-            Some(if (data.tfmemo.contains(":")) {
+          case "020137" => Some({
+            if (data.tfmemo.contains(":")) {
               val arr = data.tfmemo.split(":")
               Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(1).trim, "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
-            })
-          }
-          case "020255" => {
+            }
+          })
+          case "020255" => Some({
             val arr = data.tfmemo.split("\\^")
-            Some(if (arr.length >= 8) {
+            if (arr.length >= 8) {
               Map("发卡行" -> "", "卡号" -> data.tfcardno, "姓名" -> arr(1).trim, "证件" -> arr(3).trim, "手机" -> "", "CVN" -> "", "卡类型" -> "")
             } else {
               Map("发卡行" -> "", "卡号" -> "", "姓名" -> "", "证件" -> "", "手机" -> "", "CVN" -> "", "卡类型" -> "")
-            })
-          }
+            }
+          })
           case _ => None
         }
       }).filter(_ != None)
