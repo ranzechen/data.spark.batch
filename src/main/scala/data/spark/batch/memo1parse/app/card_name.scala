@@ -1,6 +1,5 @@
 package data.spark.batch.memo1parse.app
 
-import data.spark.batch.memo1parse.app.card_name_license.args
 import data.spark.batch.memo1parse.util.raltutil
 import org.apache.spark.{SparkConf, SparkContext}
 
