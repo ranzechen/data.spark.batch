@@ -49,6 +49,7 @@ object parseMessageAcomApp {
         val pattern = "[0-9]".r
         val id = s"${line.substring(0, 11).trim}_${line.substring(24, 30).trim}_${line.substring(31, 41).trim}_${line.substring(42, 61).trim}_${line.substring(62, 74).trim}_${line.substring(127, 142).trim}"
         val trancodekey = s"${line.substring(101, 105).trim}_${line.substring(106, 112).trim.substring(0, 2)}_${line.substring(156, 158).trim}"
+        val remark = if(trancodeMap.getOrElse(trancodekey, Array()).length !=0 ) trancodeMap.get(trancodekey).get(2).toDouble else 0
         if (line.length == 299) {
           Map(
             "acq_inst_id_code" -> line.substring(0, 11).trim,
@@ -56,7 +57,7 @@ object parseMessageAcomApp {
             "sys_trace_audit_num" -> line.substring(24, 30).trim,
             "transmsn_date_time" -> line.substring(31, 41).trim,
             "primary_acct_num" -> line.substring(42, 61).trim,
-            "amt_trans" -> line.substring(62, 74).trim.toDouble / 100 * trancodeMap.getOrElse(trancodekey, Array(""))(2).toDouble,
+            "amt_trans" -> line.substring(62, 74).trim.toDouble / 100 * remark,
             "f95" -> line.substring(75, 87).trim.toDouble / 100,
             "amt_trans_fee" -> line.substring(88, 100).trim.toDouble / 100,
             "message_type" -> line.substring(101, 105).trim,
@@ -112,7 +113,7 @@ object parseMessageAcomApp {
             "sys_trace_audit_num" -> line.substring(24, 30).trim,
             "transmsn_date_time" -> line.substring(31, 41).trim,
             "primary_acct_num" -> line.substring(42, 61).trim,
-            "amt_trans" -> line.substring(62, 74).trim.toDouble / 100 * trancodeMap.getOrElse(trancodekey, Array(""))(2).toDouble,
+            "amt_trans" -> line.substring(62, 74).trim.toDouble / 100 * remark,
             "f95" -> line.substring(75, 87).trim.toDouble / 100,
             "amt_trans_fee" -> line.substring(88, 100).trim.toDouble / 100,
             "message_type" -> line.substring(101, 105).trim,

@@ -8,7 +8,9 @@ case class ybs_sett_data_field(
                                 tfmccode: String,
                                 tfmemo1: String,
                                 tfmemo: String,
-                                tfcardno:String
+                                tfcardno:String,
+                                tfbncode:String,
+                                card_type:String
                               )
 
 
@@ -19,7 +21,9 @@ object ybs_sett_data {
       tfmccode = arr(9).trim,
       tfmemo1 = arr(58).trim,
       tfmemo = arr(57).trim,
-      tfcardno = arr(16).trim
+      tfcardno = arr(16).trim,
+      tfbncode = arr(11).trim,
+      card_type = arr(45).trim
     )
   }
 }

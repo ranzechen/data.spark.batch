@@ -46,7 +46,7 @@ object ScalaTest extends App {
   println(s.substring(345,358))
   println(s.substring(359,360))
   println(s.substring(361,460))
-  System.exit(0)
+
   /*val sparkConf = new SparkConf().setAppName("ScalaTest")
   val sc = new SparkContext(sparkConf)
   val s = raltutil.getSearcher("C:\\Users\\dell\\Desktop\\表数据\\RALT","C:\\Users\\dell\\Desktop\\表数据\\PPBANKDS","C:\\Users\\dell\\Desktop\\表数据\\RALT_CHOOSE_ITEM")
