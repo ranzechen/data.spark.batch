@@ -31,13 +31,14 @@ object card_name_license extends App{
       val p_t = new Regex("([\\u4e00-\\u9fa5]+)")
       val cardno = arr(1)
       val license = arr(3)
+      val phone = arr(4)
       val name = p_t.findAllIn(arr(2).trim).mkString
       val raltinfo = ralt.search(cardno)
       val altbank = raltinfo.get.the_card_segment
       val bankcode = raltinfo.get.bank_code
       val cardtype = raltinfo.get.card_type
       val cardlen = raltinfo.get.card_len
-      s"[${String.format("%1$-12s", altbank)}|${String.format("%1$-8s", bankcode)}|${String.format("%1$-10s", cardtype)}|${String.format("%1$-12s", cardlen)}]:${String.format("%1$-20s", cardno)}#${name + (" " * (20 - name.length * 2))}#${String.format("%1$-6s", "")}#${String.format("%1$-20s", license)}#${String.format("%1$-8s", bankcode)}#${String.format("%1$-10s", cardtype)}"
+      s"[${String.format("%1$-12s", altbank)}|${String.format("%1$-8s", bankcode)}|${String.format("%1$-10s", cardtype)}|${String.format("%1$-12s", cardlen)}]:${String.format("%1$-20s", cardno)}#${name + (" " * (20 - name.length * 2))}#${String.format("%1$-15s", if(phone.length == 11) phone else "")}#${String.format("%1$-20s", license)}#${String.format("%1$-8s", bankcode)}#${String.format("%1$-10s", cardtype)}"
     })
     .filter(_.split("#")(1).trim.length >= 2)
     .groupBy(_.split("\\|")(0).replaceAll("\\[", "").trim)
