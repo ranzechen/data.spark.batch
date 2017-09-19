@@ -2,6 +2,7 @@ package data.spark.batch.messageparse.app
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.elasticsearch.spark._
+
 import scala.collection.Map
 import scala.io.Source
 import scala.util.parsing.json.JSON
@@ -49,7 +50,7 @@ object parseMessageAcomApp {
       .map(line => {
         val id = s"${line.substring(0, 11).trim}_${line.substring(24, 30).trim}_${line.substring(31, 41).trim}_${line.substring(42, 61).trim}_${line.substring(62, 74).trim}_${line.substring(127, 142).trim}"
         val trancodekey = s"${line.substring(101, 105).trim}_${line.substring(106, 112).trim.substring(0, 2)}_${line.substring(156, 158).trim}"
-        val remark = if(trancodeMap.getOrElse(trancodekey, Array()).length !=0 ) trancodeMap.get(trancodekey).get(2).toDouble else 0
+        val remark = if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(2).toDouble else 0
         if (line.length == 299) {
           Map(
             "acq_inst_id_code" -> line.substring(0, 11).trim,
@@ -101,9 +102,9 @@ object parseMessageAcomApp {
             "account_level" -> "",
             "counter_check" -> "",
             "data_source" -> s"${jigouhao}_${input_file_name}",
-            "alfee" -> alfeeMap.getOrElse(id, 0),
-            "type_name" -> (if(trancodeMap.getOrElse(trancodekey, Array()).length !=0 ) trancodeMap.get(trancodekey).get(0) else ""),
-            "tran_code" -> (if(trancodeMap.getOrElse(trancodekey, Array()).length !=0 ) trancodeMap.get(trancodekey).get(1) else ""),
+            "alfee" -> alfeeMap.getOrElse(id, 0).toString.toDouble,
+            "type_name" -> (if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(0) else ""),
+            "tran_code" -> (if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(1) else ""),
             "id" -> id
           )
         } else if (line.length == 500) {
@@ -157,15 +158,15 @@ object parseMessageAcomApp {
             "account_level" -> line.substring(455, 456).trim,
             "counter_check" -> line.substring(457, 458).trim,
             "data_source" -> s"${args(2)}_${args(3)}",
-            "alfee" -> alfeeMap.getOrElse(id, 0),
-            "type_name" -> (if(trancodeMap.getOrElse(trancodekey, Array()).length !=0 ) trancodeMap.get(trancodekey).get(0) else ""),
-            "tran_code" -> (if(trancodeMap.getOrElse(trancodekey, Array()).length !=0 ) trancodeMap.get(trancodekey).get(1) else ""),
+            "alfee" -> alfeeMap.getOrElse(id, 0).toString.toDouble,
+            "type_name" -> (if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(0) else ""),
+            "tran_code" -> (if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(1) else ""),
             "id" -> id
           )
         } else {
           (">>>>>Exception", (line.length, line))
         }
-      }).saveToEs(s"acom_${esType.substring(0,6)}/${esType}",Map(
+      }).saveToEs(s"acom_${esType.substring(0, 6)}/${esType}", Map(
       "es.index.auto.create" -> "true",
       "es.mapping.id" -> "id",
       "es.mapping.exclude" -> "id"
