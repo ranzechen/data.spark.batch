@@ -19,7 +19,8 @@ case class raltfield(
                       medium: String,
                       functions: String,
                       special_func: String,
-                      south_card: String
+                      south_card: String,
+                      card_len:String
                     )
 
 class raltSearch(
@@ -42,7 +43,7 @@ class raltSearch(
 
           return Some(raltfield(
             bank_code = cardinfo(1).toString,
-            card_type = if (cardinfo(2).toString == "credit") "信用卡" else if (cardinfo(2).toString == "debit") "借记卡" else cardinfo(2).toString,
+            card_type = cardinfo(2).toString,//if (cardinfo(2).toString == "credit") "信用卡" else if ( == "debit") "借记卡" else cardinfo(2).toString,
             bank_name = if(ppbankds.getOrElse(cardinfo(1).toString,Array()).length != 0) ppbankds(cardinfo(1).toString)(1).toString else "",
             the_card_segment = cardinfo(0).toString,
             issuing_institution = getfuncStr(8),
@@ -53,7 +54,8 @@ class raltSearch(
             medium = getfuncStr(13),
             functions = getfuncStr(14),
             special_func = getfuncStr(15),
-            south_card = if (cardinfo(16).toString == "1") "是" else "否"
+            south_card = if (cardinfo(16).toString == "1") "是" else "否",
+            card_len = cardinfo(5)
           ))
         case None =>
       }
