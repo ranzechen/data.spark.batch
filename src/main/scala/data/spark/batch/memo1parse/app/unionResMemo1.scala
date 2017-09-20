@@ -10,6 +10,7 @@ import scala.util.parsing.json.JSON
 /**
   * Created by ranzechen on 2017/9/16.
   * 清算数据中第十二个字段为发卡行代码不用再查卡bin表了
+  * 结果形式：发卡行#卡号#姓名#证件#手机#CVN#卡类型
   */
 object unionResMemo1 {
   def main(args: Array[String]): Unit = {

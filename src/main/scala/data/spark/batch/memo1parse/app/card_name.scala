@@ -10,7 +10,7 @@ import scala.util.parsing.json.JSON
 
 /**
   * Created by ranzechen on 2017/9/19.
-  * 卡 + 户
+  * 对unionResMemo1的结果集得到卡 + 户
   */
 object card_name{
   def main(args: Array[String]): Unit = {
