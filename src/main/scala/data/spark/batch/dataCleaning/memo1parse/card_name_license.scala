@@ -1,6 +1,6 @@
-package data.spark.batch.dataCleaning.memo1parse.app
+package data.spark.batch.dataCleaning.memo1parse
 
-import data.spark.batch.dataCleaning.memo1parse.util.raltutil
+import data.spark.batch.dataCleaning.raltutil
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.Map
@@ -10,11 +10,11 @@ import scala.util.parsing.json.JSON
 
 /**
   * Created by ranzechen on 2017/9/19.
-  * 对unionResMemo1的结果集得到卡 + 户
+  * 对unionResMemo1的结果集得到卡 + 户 + 证
   */
-object card_name{
+object card_name_license {
   def main(args: Array[String]): Unit = {
-    val sparkConf = new SparkConf().setAppName("card_name")
+    val sparkConf = new SparkConf().setAppName("card_name_license")
     val sparkContext = new SparkContext(sparkConf)
 
     val config = Source.fromFile(args(0)).mkString
@@ -26,20 +26,22 @@ object card_name{
     sparkContext.textFile(args(1))
       .map(_.split("#"))
       .filter(_.length == 7)
-      .filter(_(1).trim.length != 0)
+      .filter(_(3).length != 0)
+      .filter(_(1).length != 0)
+      .filter(15 <= _ (3).length)
       .map(arr => {
         val p_t = new Regex("([\\u4e00-\\u9fa5]+)")
         val cardno = arr(1)
         val license = arr(3)
         val phone = arr(4)
         val name = p_t.findAllIn(arr(2).trim).mkString
-        val raltinfo = ralt.search(cardno)
-        if(raltinfo != None){
-          val altbank = raltinfo.get.the_card_segment
-          val bankcode = raltinfo.get.bank_code
-          val cardtype = raltinfo.get.card_type
-          val cardlen = raltinfo.get.card_len
-          s"[${String.format("%1$-12s", altbank)}|${String.format("%1$-8s", bankcode)}|${String.format("%1$-10s", cardtype)}|${String.format("%1$-12s", cardlen)}]:${String.format("%1$-20s", cardno)}#${name + (" " * (20 - name.length * 2))}#${String.format("%1$-15s", if(phone.length == 11) phone else "")}#${String.format("%1$-20s", license)}#${String.format("%1$-8s", bankcode)}#${String.format("%1$-10s", cardtype)}"
+        val raltinfo = ralt.search(cardno).get
+        if(raltinfo != None) {
+          val altbank = raltinfo.the_card_segment
+          val bankcode = raltinfo.bank_code
+          val cardtype = raltinfo.card_type
+          val cardlen = raltinfo.card_len
+          s"[${String.format("%1$-12s", altbank)}|${String.format("%1$-8s", bankcode)}|${String.format("%1$-10s", cardtype)}|${String.format("%1$-12s", cardlen)}]:${String.format("%1$-20s", cardno)}#${name + (" " * (20 - name.length * 2))}#${String.format("%1$-15s", if (phone.length == 11) phone else "")}#${String.format("%1$-20s", license)}#${String.format("%1$-8s", bankcode)}#${String.format("%1$-10s", cardtype)}"
         }else{
           ""
         }

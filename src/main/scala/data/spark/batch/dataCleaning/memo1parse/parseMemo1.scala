@@ -1,6 +1,6 @@
-package data.spark.batch.dataCleaning.memo1parse.app
+package data.spark.batch.dataCleaning.memo1parse
 
-import data.spark.batch.dataCleaning.memo1parse.util.ybs_sett_data
+import data.spark.batch.dataCleaning.ybs_sett_data
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.io.Source

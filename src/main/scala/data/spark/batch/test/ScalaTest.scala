@@ -1,8 +1,7 @@
 package data.spark.batch.test
 
 
-
-import data.spark.batch.dataCleaning.memo1parse.util.raltutil
+import data.spark.batch.dataCleaning.raltutil
 
 import scala.annotation.switch
 import org.apache.spark.{SparkConf, SparkContext}

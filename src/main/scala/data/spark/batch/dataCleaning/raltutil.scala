@@ -1,4 +1,4 @@
-package data.spark.batch.dataCleaning.memo1parse.util
+package data.spark.batch.dataCleaning
 
 /**
   * Created by ranzechen on 2017/9/16.
