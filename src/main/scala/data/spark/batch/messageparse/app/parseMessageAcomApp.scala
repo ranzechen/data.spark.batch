@@ -103,7 +103,7 @@ object parseMessageAcomApp {
             "counter_check" -> "",
             "data_source" -> s"${jigouhao}_${input_file_name}",
             "alfee" -> alfeeMap.getOrElse(id, 0).toString.toDouble,
-            "type_name" -> (if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(0) else ""),
+            "tran_code_desc" -> (if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(0) else ""),
             "tran_code" -> (if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(1) else ""),
             "id" -> id
           )
@@ -159,7 +159,7 @@ object parseMessageAcomApp {
             "counter_check" -> line.substring(457, 458).trim,
             "data_source" -> s"${args(2)}_${args(3)}",
             "alfee" -> alfeeMap.getOrElse(id, 0).toString.toDouble,
-            "type_name" -> (if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(0) else ""),
+            "tran_code_desc" -> (if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(0) else ""),
             "tran_code" -> (if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(1) else ""),
             "id" -> id
           )
