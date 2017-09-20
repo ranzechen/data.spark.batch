@@ -1,4 +1,4 @@
-package data.spark.batch.memo1parse.app
+package data.spark.batch.dataCleaning.memo1parse.app
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}

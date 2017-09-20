@@ -1,6 +1,6 @@
-package data.spark.batch.memo1parse.app
+package data.spark.batch.dataCleaning.memo1parse.app
 
-import data.spark.batch.memo1parse.util.raltutil
+import data.spark.batch.dataCleaning.memo1parse.util.raltutil
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.Map

@@ -1,6 +1,6 @@
-package data.spark.batch.memo1parse.app
+package data.spark.batch.dataCleaning.memo1parse.app
 
-import data.spark.batch.memo1parse.util.raltutil
+import data.spark.batch.dataCleaning.memo1parse.util.raltutil
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.Map
@@ -10,11 +10,11 @@ import scala.util.parsing.json.JSON
 
 /**
   * Created by ranzechen on 2017/9/19.
-  * 对unionResMemo1的结果集得到卡 + 户 + 证
+  * 对unionResMemo1的结果集得到卡 + 证
   */
-object card_name_license {
+object card_license{
   def main(args: Array[String]): Unit = {
-    val sparkConf = new SparkConf().setAppName("card_name_license")
+    val sparkConf = new SparkConf().setAppName("card_license")
     val sparkContext = new SparkContext(sparkConf)
 
     val config = Source.fromFile(args(0)).mkString
@@ -23,10 +23,8 @@ object card_name_license {
     val ppbankdspath = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("ppbankdspath").toString
 
     val ralt = raltutil.getSearcher(raltpath, ralt_choose_itempath, ppbankdspath)
-    sparkContext.textFile(args(1))
-      .map(_.split("#"))
+    sparkContext.textFile(args(1)).map(_.split("#"))
       .filter(_.length == 7)
-      .filter(_(3).length != 0)
       .filter(_(1).length != 0)
       .filter(15 <= _ (3).length)
       .map(arr => {
@@ -47,7 +45,6 @@ object card_name_license {
         }
       })
       .filter(_.length != 0)
-      .filter(_.split("#")(1).trim.length >= 2)
       .groupBy(_.split("\\|")(0).replaceAll("\\[", "").trim)
       .map(data => {
         val alt_bank = data._1
