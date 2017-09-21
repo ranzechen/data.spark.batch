@@ -1,6 +1,5 @@
 package data.spark.batch.dataCleaning.areaCount
 
-import net.sf.json.JSONObject
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
