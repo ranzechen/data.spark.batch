@@ -2,8 +2,14 @@
   "parseMessage_ES_IP": "175.10.100.14",
   "parseMessage_ES_PORT": "9200",
   "parseMessage_ES_CLUSTER_NAME": "es-test",
+  "cardbin_ES_IP" : "175.10.100.14",
+  "cardbin_ES_PORT" : "9200",
+  "cardbin_ES_CLUSTER_NAME" : "es-test",
+  "cardbin_index_type" : "cardbin/info",
   "raltpath": "C:\Users\dell\Desktop\表数据\RALT",
   "ppbankdspath": "C:\Users\dell\Desktop\表数据\PPBANKDS",
   "ralt_choose_itempath": "C:\Users\dell\Desktop\表数据\RALT_CHOOSE_ITEM",
-  "trancodepath": "C:\Users\dell\Desktop\表数据\TRAN_CODE"
+  "trancodepath": "C:\Users\dell\Desktop\表数据\TRAN_CODE",
+  "area_path":"C:\Users\dell\Desktop\鉴权\area_acom.csv",
+  "banknopath":"C:\Users\dell\Desktop\鉴权\\bankno.csv"
 }
