@@ -31,7 +31,6 @@ object unionResCountArea {
     val banknomap = sparkContext.textFile(banknopath).map(_.split(","))
       .map(arr => (arr(1), arr(0))).collect().toMap
 
-
     all_rdd(files.map(file => {
       old_rdd(file, sparkContext)
     }))
