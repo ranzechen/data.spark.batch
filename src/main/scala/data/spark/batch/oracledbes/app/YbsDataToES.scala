@@ -7,8 +7,6 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.elasticsearch.spark._
 
 import scala.collection.Map
-import scala.io.Source
-import scala.util.parsing.json.JSON
 
 /**
   * Created by ranzechen on 2017/7/14.
