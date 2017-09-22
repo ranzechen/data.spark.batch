@@ -50,7 +50,7 @@ object unionResCountArea {
         val cardbin = data._1
         val bankinfo = data._2.map(data => (data._1,banknomap.getOrElse(data._1, data._1))).toMap
         val areainfo = data._2.map(data => (data._2 , area_map.getOrElse(data._2, data._2))).toMap
-        val info = data._2.map(data => (area_map.getOrElse(data._2, data._2),data._3)).toMap
+        val info = data._2.map(data => (area_map.getOrElse(data._2, data._2),data._3)).toSeq.sortBy(_._2).toMap
         Map("cardbin" -> cardbin, "bank_desc" -> bankinfo,"area_desc" -> areainfo,"count" -> info)
       }).sortBy(_.get("cardbin").get.toString)
       .saveToEs(index_type,Map(
