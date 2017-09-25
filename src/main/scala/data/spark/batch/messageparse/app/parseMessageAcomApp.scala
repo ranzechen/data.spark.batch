@@ -1,6 +1,7 @@
 package data.spark.batch.messageparse.app
 
 import org.apache.spark.{SparkConf, SparkContext}
+import org.elasticsearch.spark._
 
 import scala.collection.Map
 import scala.io.Source
@@ -170,11 +171,10 @@ object parseMessageAcomApp {
         } else {
           (">>>>>Exception", (line.length, line))
         }
-      }) /*.saveToEs(s"acom_${args(1).substring(0, 6)}/${args(1)}", Map(
+      }).saveToEs(s"acom_${args(1).substring(0, 6)}/${args(1)}", Map(
       "es.index.auto.create" -> "true",
       "es.mapping.id" -> "id",
       "es.mapping.exclude" -> "id"
-    ))*/
-      .foreach(println)
+    ))
   }
 }
