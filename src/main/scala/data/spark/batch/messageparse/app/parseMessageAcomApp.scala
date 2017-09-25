@@ -10,14 +10,13 @@ import scala.util.parsing.json.JSON
 /**
   * Created by ranzechen on 2017/8/17.
   * 解析一般流水报文文件
-  * usage:{args(0)=hdfspath args(1)=estype args(2)=机构号 args(3)=输入文件名称 args(4)=品牌费文件路径 args(5)=配置文件路径}
+  * usage:{args(0)=hdfspath args(1)=args(1) args(2)=机构号 args(3)=输入文件名称 args(4)=配置文件路径 args(5)=品牌费文件路径}
   */
 object parseMessageAcomApp {
-
+  private var alfeeMap: Map[String, Double] = null
   def main(args: Array[String]): Unit = {
-    val Array(inputpath, esType, jigouhao, input_file_name, alfeepath, configfile) = args
     //读取配置文件并获取到所需要的关联表的路径
-    val config = Source.fromFile(configfile).mkString
+    val config = Source.fromFile(args(4)).mkString
     val trancodepath = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("trancodepath").toString
     val es_ip = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("parseMessage_ES_IP").toString
     val es_port = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("parseMessage_ES_PORT").toString
@@ -39,15 +38,20 @@ object parseMessageAcomApp {
       }).collect().toMap
     val pattern = "[0-9]".r
     //添加品牌费字段并根据id转为map获取
-    val alfeeMap = sparkContext.textFile(alfeepath)
-      .map(line => {
-        val key = s"${line.substring(41, 52).trim}_${line.substring(116, 122).trim}_${line.substring(123, 133).trim}_${line.substring(134, 153).trim}_${line.substring(293, 305).trim}_${line.substring(264, 279).trim}"
-        val value = pattern.findAllIn(line.substring(319, 331).trim).mkString.toDouble / 100
-        (key, value)
-      }).collect().toMap
+    if(args.length <= 5){
+      alfeeMap = Map("0" -> 0)
+    }else{
+      alfeeMap = sparkContext.textFile(args(5))
+        .map(line => {
+          val key :String= s"${line.substring(41, 52).trim}_${line.substring(116, 122).trim}_${line.substring(123, 133).trim}_${line.substring(134, 153).trim}_${line.substring(293, 305).trim}_${line.substring(264, 279).trim}"
+          val value:Double = pattern.findAllIn(line.substring(319, 331).trim).mkString.toDouble / 100
+          (key, value)
+        }).collect().toMap
+    }
 
-    sparkContext.textFile(inputpath)
+    sparkContext.textFile(args(0))
       .map(line => {
+        val map = alfeeMap
         val id = s"${line.substring(0, 11).trim}_${line.substring(24, 30).trim}_${line.substring(31, 41).trim}_${line.substring(42, 61).trim}_${line.substring(62, 74).trim}_${line.substring(127, 142).trim}"
         val trancodekey = s"${line.substring(101, 105).trim}_${line.substring(106, 112).trim.substring(0, 2)}_${line.substring(156, 158).trim}"
         val remark = if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(2).toDouble else 0
@@ -101,8 +105,8 @@ object parseMessageAcomApp {
             "pay_way" -> "",
             "account_level" -> "",
             "counter_check" -> "",
-            "data_source" -> s"${jigouhao}_${input_file_name}",
-            "alfee" -> alfeeMap.getOrElse(id, 0).toString.toDouble,
+            "data_source" -> s"${args(2)}_${args(3)}",
+            "alfee" -> map.getOrElse(id, 0).toString.toDouble,
             "tran_code_desc" -> (if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(0) else ""),
             "tran_code" -> (if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(1) else ""),
             "id" -> id
@@ -158,7 +162,7 @@ object parseMessageAcomApp {
             "account_level" -> line.substring(455, 456).trim,
             "counter_check" -> line.substring(457, 458).trim,
             "data_source" -> s"${args(2)}_${args(3)}",
-            "alfee" -> alfeeMap.getOrElse(id, 0).toString.toDouble,
+            "alfee" -> map.getOrElse(id, 0).toString.toDouble,
             "tran_code_desc" -> (if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(0) else ""),
             "tran_code" -> (if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(1) else ""),
             "id" -> id
@@ -166,10 +170,11 @@ object parseMessageAcomApp {
         } else {
           (">>>>>Exception", (line.length, line))
         }
-      }).saveToEs(s"acom_${esType.substring(0, 6)}/${esType}", Map(
+      })/*.saveToEs(s"acom_${args(1).substring(0, 6)}/${args(1)}", Map(
       "es.index.auto.create" -> "true",
       "es.mapping.id" -> "id",
       "es.mapping.exclude" -> "id"
-    ))
+    ))*/
+      .foreach(println)
   }
 }
