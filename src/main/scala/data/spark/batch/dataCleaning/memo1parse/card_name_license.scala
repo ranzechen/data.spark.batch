@@ -24,6 +24,11 @@ object card_name_license {
     val ppbankdspath = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("ppbankdspath").toString
 
     val ralt = raltutil.getSearcher(raltpath, ralt_choose_itempath, ppbankdspath)
+
+    val filtercardno = sparkContext.textFile(args(3))
+      .map(_.split(":")(1).split("#")(0).trim)
+      .collect().toSet
+
     sparkContext.textFile(args(1))
       .map(_.split("#"))
       .filter(_.length == 7) //过滤出按照#分割数组长度为7的数据
@@ -31,6 +36,7 @@ object card_name_license {
       .filter(_ (1).length != 0) //过滤出卡号长度不等于0的数据
       .filter(15 <= _ (3).length) //过滤出证件号长度大于等于15位的数据
       .map(data => (data(1), (data(2), data(3)))) //拼接(卡号,(姓名,证件)) 从而去掉同一个卡号下有多个姓名和证件号-------------->考虑了两种，没有考虑同名的
+      .filter(data => {if(filtercardno.contains(data._1)) false else true})
       .groupByKey()
       .map(data => {
         val carno = data._1
