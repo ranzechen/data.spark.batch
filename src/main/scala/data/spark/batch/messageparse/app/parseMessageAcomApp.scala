@@ -1,7 +1,6 @@
 package data.spark.batch.messageparse.app
 
 import org.apache.spark.{SparkConf, SparkContext}
-import org.elasticsearch.spark._
 
 import scala.collection.Map
 import scala.io.Source
@@ -14,6 +13,7 @@ import scala.util.parsing.json.JSON
   */
 object parseMessageAcomApp {
   private var alfeeMap: Map[String, Double] = null
+
   def main(args: Array[String]): Unit = {
     //读取配置文件并获取到所需要的关联表的路径
     val config = Source.fromFile(args(4)).mkString
@@ -38,13 +38,13 @@ object parseMessageAcomApp {
       }).collect().toMap
     val pattern = "[0-9]".r
     //添加品牌费字段并根据id转为map获取
-    if(args.length <= 5){
+    if (args.length <= 5) {
       alfeeMap = Map("0" -> 0)
-    }else{
+    } else {
       alfeeMap = sparkContext.textFile(args(5))
         .map(line => {
-          val key :String= s"${line.substring(41, 52).trim}_${line.substring(116, 122).trim}_${line.substring(123, 133).trim}_${line.substring(134, 153).trim}_${line.substring(293, 305).trim}_${line.substring(264, 279).trim}"
-          val value:Double = pattern.findAllIn(line.substring(319, 331).trim).mkString.toDouble / 100
+          val key: String = s"${line.substring(41, 52).trim}_${line.substring(116, 122).trim}_${line.substring(123, 133).trim}_${line.substring(134, 153).trim}_${line.substring(293, 305).trim}_${line.substring(264, 279).trim}"
+          val value: Double = pattern.findAllIn(line.substring(319, 331).trim).mkString.toDouble / 100
           (key, value)
         }).collect().toMap
     }
@@ -170,7 +170,7 @@ object parseMessageAcomApp {
         } else {
           (">>>>>Exception", (line.length, line))
         }
-      })/*.saveToEs(s"acom_${args(1).substring(0, 6)}/${args(1)}", Map(
+      }) /*.saveToEs(s"acom_${args(1).substring(0, 6)}/${args(1)}", Map(
       "es.index.auto.create" -> "true",
       "es.mapping.id" -> "id",
       "es.mapping.exclude" -> "id"
