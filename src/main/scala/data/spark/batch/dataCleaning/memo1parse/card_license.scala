@@ -34,7 +34,7 @@ object card_license {
       .filter(_ (1).length != 0) //过滤出卡号长度不等于0的数据
       .filter(15 <= _ (3).length) //过滤出证件号长度大于等于15位的数据
       .map(data => (data(1), (data(3), data(2), data(4)))) //拼接(卡,(证,户,手机号))分组并统计list个数只取size为1的
-      .filter(data => {if(filtercardno.contains(data._1)) false else true})
+      .filter(data => {!(filtercardno.contains(data._1))})
       .groupByKey()
       .map(data => {
         val carno = data._1
