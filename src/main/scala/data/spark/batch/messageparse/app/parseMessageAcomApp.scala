@@ -10,14 +10,13 @@ import scala.util.parsing.json.JSON
 /**
   * Created by ranzechen on 2017/8/17.
   * 解析一般流水报文文件
-  * usage:{args(0)=hdfspath args(1)=args(1) args(2)=机构号 args(3)=输入文件名称 args(4)=配置文件路径 args(5)=品牌费文件路径}
+  * usage:{args(0)=配置文件路径 args(1)=args(1) args(2)=机构号 args(3)=输入文件名称 args(4)=hdfspath args(5)=品牌费文件路径}
   */
 object parseMessageAcomApp {
   private var alfeeMap: Map[String, Double] = null
-
   def main(args: Array[String]): Unit = {
     //读取配置文件并获取到所需要的关联表的路径
-    val config = Source.fromFile(args(4)).mkString
+    val config = Source.fromFile(args(0)).mkString
     val trancodepath = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("trancodepath").toString
     val es_ip = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("parseMessage_ES_IP").toString
     val es_port = JSON.parseFull(config).asInstanceOf[Option[Map[String, Any]]].get("parseMessage_ES_PORT").toString
@@ -49,10 +48,9 @@ object parseMessageAcomApp {
           (key, value)
         }).collect().toMap
     }
-
-    sparkContext.textFile(args(0))
+    val map = alfeeMap
+    sparkContext.textFile(args(4))
       .map(line => {
-        val map = alfeeMap
         val id = s"${line.substring(0, 11).trim}_${line.substring(24, 30).trim}_${line.substring(31, 41).trim}_${line.substring(42, 61).trim}_${line.substring(62, 74).trim}_${line.substring(127, 142).trim}"
         val trancodekey = s"${line.substring(101, 105).trim}_${line.substring(106, 112).trim.substring(0, 2)}_${line.substring(156, 158).trim}"
         val remark = if (trancodeMap.getOrElse(trancodekey, Array()).length != 0) trancodeMap.get(trancodekey).get(2).toDouble else 0
