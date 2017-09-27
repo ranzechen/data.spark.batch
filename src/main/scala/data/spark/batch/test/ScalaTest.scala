@@ -1,25 +1,25 @@
 package data.spark.batch.test
 
-
 import data.spark.batch.dataCleaning.raltutil
+import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.annotation.switch
-import org.apache.spark.{SparkConf, SparkContext}
+
 /**
   * Created by ranzechen on 2017/9/7.
   */
 object ScalaTest extends App {
-  val s = "[421317      |600403|debit     |16          ]:4213173000730440    #王研                #      #                    #600403  #debit     "
-  println("瑾                  ".trim.length)
+  implicit def str2double(s: Double) = s.toString
+  var arr:String = 1111.111
   System.exit(0)
-  /*val sparkConf = new SparkConf().setAppName("ScalaTest")
+  val sparkConf = new SparkConf().setAppName("ScalaTest")
   val sc = new SparkContext(sparkConf)
   val s = raltutil.getSearcher("C:\\Users\\dell\\Desktop\\表数据\\RALT","C:\\Users\\dell\\Desktop\\表数据\\PPBANKDS","C:\\Users\\dell\\Desktop\\表数据\\RALT_CHOOSE_ITEM")
     .search("622202300600523066")
   println(s)
   println(s.get.bank_name)
   println(s.get.functions)
-  println(s.get.card_type)*/
+  println(s.get.card_type)
   val name = "ranzechen6666"
   val age = 23
   //从第一位开始取出多少个字符,并将第一个字符转为大写
